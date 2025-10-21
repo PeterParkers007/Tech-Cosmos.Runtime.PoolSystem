@@ -60,6 +60,18 @@ csharp
 var effectPool = PoolManager.Instance.GetPool<ParticleEffect, MoveCommandEffect>();
 MoveCommandEffect effect = effectPool.Get();
 effect.transform.position = targetPosition;
+！注意！
+
+如果不用var 而是明确池类型的话
+Pool<Bullet> bulletPool;  对
+
+
+Pool<Bullet> fireBullet;  对
+
+Pool<FireBullet> fireBullet; 不对！！！！
+
+Pool<T> 这个T一定只能是父类 一定！一定！
+
 回收对象：
 csharp
 // 在需要回收的组件中
