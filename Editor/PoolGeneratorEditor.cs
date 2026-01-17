@@ -17,7 +17,7 @@ namespace ZJM_PoolSystem.Editor
         private List<Type> poolableTypes = new List<Type>();
         private Dictionary<Type, bool> selectedTypes = new Dictionary<Type, bool>();
 
-        [MenuItem("Tools/对象池/生成池类代码")]
+        [MenuItem("Tech-Cosmos/对象池/生成池类代码")]
         public static void ShowWindow()
         {
             var window = GetWindow<PoolGeneratorEditor>("池代码生成器");
