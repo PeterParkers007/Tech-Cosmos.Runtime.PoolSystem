@@ -42,7 +42,7 @@ public class ParticleEffect : MonoBehaviour
 - **功能**: 扫描项目中所有标记了 `[Poolable]` 特性的组件
 - **操作**: 选择要生成的类型，点击生成按钮
 
-工具将自动在 `Assets/ZJM_PoolSystem/GeneratedPools/` 目录下生成对应的池类代码：
+工具将自动在 `Assets/PoolSystem/GeneratedPools/` 目录下生成对应的池类代码：
 
 ```csharp
 // 自动生成的 BulletPool.cs
