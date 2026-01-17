@@ -1,6 +1,6 @@
 # TechCosmos PoolSystem 对象池系统
 
-一个基于 Unity ScriptableObject 的轻量级、类型安全的对象池系统，支持编辑器配置和运行时动态管理。
+一个基于 Unity ScriptableObject 的轻量级、类型安全的对象池系统，支持编辑器配置、代码生成和运行时动态管理。
 
 ## ✨ 功能特性
 
@@ -10,11 +10,62 @@
 - **🎮 自动回收** - 内置生命周期管理和自动回收机制
 - **🔧 高度可扩展** - 支持自定义创建、回收、销毁逻辑
 - **👨‍💻 编辑器友好** - 完整的 Inspector 配置和验证
+- **⚡ 自动代码生成** - 基于特性标记自动生成池类代码
+- **🏷️ 智能扫描** - 自动发现项目中可池化的组件
 
 ## 🚀 快速开始
 
-### 1. 创建对象池配置
+### 1. 标记可池化组件
 
+在需要池化的 MonoBehaviour 类上添加 `[Poolable]` 特性：
+
+```csharp
+using ZJM_PoolSystem.Runtime;
+
+[Poolable(DisplayName = "子弹池", MenuPath = "Pool/Combat/")]
+public class Bullet : MonoBehaviour
+{
+    // 子弹逻辑...
+}
+
+[Poolable(DisplayName = "特效池", MenuPath = "Pool/Effects/")]
+public class ParticleEffect : MonoBehaviour
+{
+    // 特效逻辑...
+}
+```
+
+### 2. 自动生成池类代码
+
+打开代码生成工具：
+- **菜单路径**: Tools/对象池/生成池类代码
+- **功能**: 扫描项目中所有标记了 `[Poolable]` 特性的组件
+- **操作**: 选择要生成的类型，点击生成按钮
+
+工具将自动在 `Assets/ZJM_PoolSystem/GeneratedPools/` 目录下生成对应的池类代码：
+
+```csharp
+// 自动生成的 BulletPool.cs
+using UnityEngine;
+using ZJM_PoolSystem.Runtime;
+
+namespace ZJM_PoolSystem.Generated
+{
+    [CreateAssetMenu(fileName = "New 子弹池", menuName = "Pool/Combat/子弹池", order = 100)]
+    public class BulletPool : Pool<Bullet>
+    {
+        // 可以在这里添加特定于Bullet池的逻辑
+    }
+}
+```
+
+### 3. 创建对象池配置
+
+**方法一（推荐） - 使用生成的池类：**
+- 在 Project 窗口右键 → Create → Pool/Combat → 子弹池
+- 系统会自动创建 BulletPool 的 ScriptableObject 配置
+
+**方法二 - 手动创建（如需自定义）：**
 ```csharp
 [CreateAssetMenu(fileName = "New Bullet Pool", menuName = "Pool/Bullet Pool")]
 public class BulletPool : Pool<Bullet> { }
@@ -23,21 +74,19 @@ public class BulletPool : Pool<Bullet> { }
 public class ParticleEffectPool : Pool<ParticleEffect> { }
 ```
 
-**创建步骤：**
-- 在 Project 窗口右键 → Create → Pool → 选择对应的池类型
-- 配置池参数：
-  - **Prefab**: 拖入要池化的预制体
-  - **Default Capacity**: 初始容量（推荐10）
-  - **Max Size**: 最大容量（推荐100）
-  - **Collection Check**: 启用重复回收检查（调试时建议开启）
+**配置池参数：**
+- **Prefab**: 拖入要池化的预制体
+- **Default Capacity**: 初始容量（推荐10）
+- **Max Size**: 最大容量（推荐100）
+- **Collection Check**: 启用重复回收检查（调试时建议开启）
 
-### 2. 配置 PoolManager
+### 4. 配置 PoolManager
 
 1. 创建空 GameObject，添加 `PoolManager` 组件
 2. 将创建好的池配置拖入 `Pools` 列表
 3. （可选）设置 `poolRoot` 作为回收对象的统一父节点
 
-### 3. 使用对象池
+### 5. 使用对象池
 
 #### 获取对象：
 ```csharp
@@ -67,6 +116,22 @@ public class Bullet : MonoBehaviour
 ```
 
 ## 📖 核心概念
+
+### PoolableAttribute 特性说明
+
+`[Poolable]` 特性用于标记可以被对象池管理的组件：
+
+```csharp
+[Poolable]  // 使用默认设置
+public class SimpleObject : MonoBehaviour { }
+
+[Poolable(
+    DisplayName = "自定义名称",  // 池的显示名称
+    MenuPath = "Pool/Category/", // 创建菜单路径
+    Icon = "CustomIcon"          // 图标名称（可选）
+)]
+public class CustomObject : MonoBehaviour { }
+```
 
 ### Pool<T> 泛型参数说明
 
@@ -174,6 +239,30 @@ public class FireBullet : Bullet
 }
 ```
 
+## 🎨 编辑器工具
+
+### PoolGeneratorEditor 代码生成器
+
+**位置：** Tools/对象池/生成池类代码
+
+**功能：**
+1. 自动扫描项目中所有标记了 `[Poolable]` 特性的组件
+2. 可视化选择要生成的池类
+3. 自动生成带正确命名空间的代码文件
+4. 支持自定义显示名称和菜单路径
+
+**快捷键操作：**
+- 点击"全选"按钮选择所有类型
+- 点击"全不选"取消选择所有类型
+- 点击"刷新"重新扫描项目
+
+### 自动命名空间处理
+
+系统智能处理命名空间：
+- 如果组件在 `ZJM_PoolSystem.Runtime` 中，直接使用
+- 如果组件在其他命名空间，自动添加对应的 `using` 语句
+- 生成的池类统一放在 `ZJM_PoolSystem.Generated` 命名空间
+
 ## 🔧 高级用法
 
 ### 自定义池逻辑
@@ -220,6 +309,25 @@ public class EventDrivenPool<T> : Pool<T> where T : Component
 }
 ```
 
+### 扩展特性配置
+
+```csharp
+// 支持自定义容量配置的特性
+public class PoolableWithConfigAttribute : PoolableAttribute
+{
+    public int DefaultCapacity { get; set; } = 10;
+    public int MaxSize { get; set; } = 100;
+}
+
+// 使用示例
+[PoolableWithConfig(
+    DisplayName = "重型子弹",
+    DefaultCapacity = 5,
+    MaxSize = 20
+)]
+public class HeavyBullet : MonoBehaviour { }
+```
+
 ## 🐛 故障排除
 
 ### 常见问题
@@ -243,6 +351,11 @@ public class EventDrivenPool<T> : Pool<T> where T : Component
 - 确保 `GetPool<T,U>` 的 T 是父类，U 是子类
 - 检查预制体类型与池配置是否匹配
 
+**Q: 代码生成失败**
+- 确保组件继承自 MonoBehaviour
+- 检查是否有编译错误
+- 确认组件不是抽象类
+
 ### 调试技巧
 
 ```csharp
@@ -254,6 +367,19 @@ public void DebugPoolStatus()
         Debug.Log($"{pool.PoolType.Name}: Active={pool.CountActive}, Inactive={pool.CountInactive}");
     }
 }
+
+// 在池类中添加调试日志
+protected override void OnGet(T obj)
+{
+    base.OnGet(obj);
+    Debug.Log($"获取对象: {obj.name} (池: {typeof(T).Name})");
+}
+
+protected override void OnRelease(T obj)
+{
+    Debug.Log($"回收对象: {obj.name} (池: {typeof(T).Name})");
+    base.OnRelease(obj);
+}
 ```
 
 ## 📋 版本要求
@@ -262,7 +388,38 @@ public void DebugPoolStatus()
 - **.NET**: 4.x 运行时
 - **依赖**: 无外部依赖
 
+## 📁 项目结构
+
+```
+Assets/
+├── ZJM_PoolSystem/
+│   ├── Runtime/
+│   │   ├── Pool.cs              # 泛型对象池基类
+│   │   ├── PoolBase.cs          # 池抽象基类
+│   │   ├── PoolManager.cs       # 池管理器
+│   │   ├── PoolableAttribute.cs # 池化特性标记
+│   │   └── Utility/
+│   │       └── Singleton.cs     # 单例基类
+│   ├── Editor/
+│   │   └── PoolGeneratorEditor.cs  # 代码生成器  
+└── YourProject/
+    └── Scripts/
+        ├── Bullet.cs           # 标记[Poolable]
+        └── ParticleEffect.cs   # 标记[Poolable]
+    └── GeneratedPools/          # 自动生成的池类
+│       ├── BulletPool.cs
+│       ├── ParticleEffectPool.cs
+│       └── ...
+```
+
 ## 📝 更新日志
+
+### v2.0.0
+- **新增**: 基于特性的自动代码生成系统
+- **新增**: `[Poolable]` 特性标记系统
+- **新增**: 可视化编辑器工具 PoolGeneratorEditor
+- **优化**: 智能命名空间处理
+- **优化**: 更完善的错误提示和验证
 
 ### v1.0.0
 - 基于 ScriptableObject 的可视化配置
@@ -276,4 +433,4 @@ MIT License - 可自由用于商业项目
 
 ---
 
-**提示**: 使用过程中遇到问题，请检查控制台错误信息，大多数问题都有详细的错误提示。
+**提示**: 使用过程中遇到问题，请检查控制台错误信息，大多数问题都有详细的错误提示。如果代码生成有问题，可以手动创建池类配置。
