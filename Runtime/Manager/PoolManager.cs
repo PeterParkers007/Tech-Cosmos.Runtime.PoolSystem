@@ -64,6 +64,46 @@ namespace ZJM_PoolSystem.Runtime
             return null;
         }
 
+        // 在 PoolManager.cs 中添加以下方法
+
+        /// <summary>
+        /// 根据组件类型和预设类型动态获取对象池（运行时版本）
+        /// </summary>
+        /// <param name="componentType">组件类型（如 typeof(Projectile)）</param>
+        /// <param name="prefabType">预设的具体类型（如 typeof(ArrowProjectile)）</param>
+        /// <returns>匹配的对象池</returns>
+        public PoolBase GetPool(Type componentType, Type prefabType)
+        {
+            foreach (var pool in pools)
+            {
+                // 检查池的类型是否匹配 componentType
+                if (pool.PoolType == componentType)
+                {
+                    // 通过反射获取 prefab 字段的值
+                    var prefabField = pool.GetType().GetField("prefab");
+                    if (prefabField != null)
+                    {
+                        var prefab = prefabField.GetValue(pool) as Component;
+                        if (prefab != null && prefab.GetType() == prefabType)
+                        {
+                            return pool;
+                        }
+                    }
+                }
+            }
+            
+            Debug.LogError($"未找到管理 [{componentType.Name}] 且预设类型为 [{prefabType.Name}] 的对象池");
+            return null;
+        }
+
+        /// <summary>
+        /// 泛型便捷包装（用于已知 componentType 的情况）
+        /// </summary>
+        public Pool<T> GetPoolByPrefabType<T>(Type prefabType) where T : Component
+        {
+            return GetPool(typeof(T), prefabType) as Pool<T>;
+        }
+
         /// <summary>
         /// 清空所有对象池（场景切换时调用）
         /// </summary>
