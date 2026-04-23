@@ -123,8 +123,8 @@ namespace ZJM_PoolSystem.Editor
                 return false;
 
             // 不能是抽象类
-            if (type.IsAbstract)
-                return false;
+            // if (type.IsAbstract)
+            //     return false;
 
             // 必须有PoolableAttribute特性
             return Attribute.IsDefined(type, typeof(PoolableAttribute));
