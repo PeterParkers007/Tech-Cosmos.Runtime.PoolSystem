@@ -6,7 +6,7 @@ namespace ZJM_PoolSystem.Runtime
     /// <summary>
     /// 标记一个组件可以被对象池管理
     /// </summary>
-    [System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    [System.AttributeUsage(System.AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
     public class PoolableAttribute : System.Attribute
     {
         /// <summary>
