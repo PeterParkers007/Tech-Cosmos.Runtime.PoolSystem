@@ -65,7 +65,33 @@ namespace ZJM_PoolSystem.Runtime
             return null;
         }
 
-        // 在 PoolManager.cs 中添加以下方法
+        /// <summary>
+        /// 根据组件类型获取对象池
+        /// </summary>
+        public Pool<T> GetPool<T>() where T : Component
+        {
+            foreach (var pool in pools)
+            {
+                if (pool is Pool<T> targetPool)
+                    return targetPool;
+            }
+            Debug.LogError($"未找到管理[{typeof(T).Name}]的对象池");
+            return null;
+        }
+
+        /// <summary>
+        /// 根据预设子类型获取对象池（返回精确类型，无需强转）
+        /// </summary>
+        public Pool<U> GetPool<T, U>() where T : Component where U : T
+        {
+            foreach (var pool in pools)
+            {
+                if (pool is Pool<U> targetPool && targetPool.prefab is U)
+                    return targetPool;
+            }
+            Debug.LogError($"未找到管理[{typeof(U).Name}]的对象池");
+            return null;
+        }
 
         /// <summary>
         /// 根据组件类型和预设类型动态获取对象池（运行时版本）
