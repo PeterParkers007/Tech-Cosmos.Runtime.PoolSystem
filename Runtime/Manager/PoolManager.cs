@@ -76,7 +76,7 @@ namespace ZJM_PoolSystem.Runtime
             if (pool is Pool<T> typedPool)
                 return typedPool;
 
-            Debug.LogError($"未找到预制体[{prefabName}]对应的{typeof(T).Name}池");
+            Debug.LogError($"预制体[{prefabName}]的池类型是{pool.GetType().Name}，不匹配{typeof(T).Name}");
             return null;
         }
         /// <summary>
