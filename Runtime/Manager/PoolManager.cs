@@ -73,16 +73,11 @@ namespace ZJM_PoolSystem.Runtime
                 Debug.LogError($"未找到预制体[{prefabName}]的池");
                 return null;
             }
-
-            // 通过反射拿池的泛型参数
-            Type poolType = pool.GetType();
-            while (poolType != null && !poolType.IsGenericType)
-                poolType = poolType.BaseType;
-
+            Type poolType = pool.PoolType;
             if (poolType != null)
             {
                 Type prefabType = poolType.GetGenericArguments()[0]; // 池里预制体的类型
-                if (typeof(T).IsAssignableFrom(prefabType))          // T 是父类，prefabType 是子类 → 成立
+                if (poolType.IsAssignableFrom(typeof(T)))          // 池的泛型参数是父类,T是目标子类
                 {
                     return pool as Pool<T>;  // 安全转换
                 }
