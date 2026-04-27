@@ -68,15 +68,27 @@ namespace ZJM_PoolSystem.Runtime
         public Pool<T> GetPool<T>(string prefabName) where T : Component
         {
             var pool = GetPoolByPrefabName(prefabName);
-            if(pool == null)
+            if (pool == null)
             {
-                Debug.LogError($"[Name]未找到预制体[{prefabName}]对应的{typeof(T).Name}池");
+                Debug.LogError($"未找到预制体[{prefabName}]的池");
                 return null;
             }
-            if (pool is Pool<T> typedPool)
-                return typedPool;
 
-            Debug.LogError($"预制体[{prefabName}]的池类型是{pool.GetType().Name}，不匹配{typeof(T).Name}");
+            // 通过反射拿池的泛型参数
+            Type poolType = pool.GetType();
+            while (poolType != null && !poolType.IsGenericType)
+                poolType = poolType.BaseType;
+
+            if (poolType != null)
+            {
+                Type prefabType = poolType.GetGenericArguments()[0]; // 池里预制体的类型
+                if (typeof(T).IsAssignableFrom(prefabType))          // T 是父类，prefabType 是子类 → 成立
+                {
+                    return pool as Pool<T>;  // 安全转换
+                }
+            }
+
+            Debug.LogError($"预制体[{prefabName}]的类型不兼容{typeof(T).Name}");
             return null;
         }
         /// <summary>
