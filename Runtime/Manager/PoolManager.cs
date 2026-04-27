@@ -49,21 +49,21 @@ namespace ZJM_PoolSystem.Runtime
         /// </summary>
         /// <typeparam name="T">池管理的组件类型</typeparam>
         /// <returns>对应的泛型对象池实例</returns>
-        public Pool<T> GetPool<T, U>() where T : Component
-        {
-            foreach (var pool in pools)
-            {
-                if (pool is Pool<T> targetPool)
-                {
-                    if (targetPool.prefab.GetType() == typeof(U))
-                    {
-                        return targetPool;
-                    }
-                }
-            }
-            Debug.LogError($"未找到管理[{typeof(T).Name}]的对象池，请检查PoolManager配置");
-            return null;
-        }
+        // public Pool<T> GetPool<T, U>() where T : Component
+        // {
+        //     foreach (var pool in pools)
+        //     {
+        //         if (pool is Pool<T> targetPool)
+        //         {
+        //             if (targetPool.prefab.GetType() == typeof(U))
+        //             {
+        //                 return targetPool;
+        //             }
+        //         }
+        //     }
+        //     Debug.LogError($"未找到管理[{typeof(T).Name}]的对象池，请检查PoolManager配置");
+        //     return null;
+        // }
 
         /// <summary>
         /// 根据组件类型获取对象池
