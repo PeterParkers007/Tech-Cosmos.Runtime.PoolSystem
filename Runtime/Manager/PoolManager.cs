@@ -68,6 +68,11 @@ namespace ZJM_PoolSystem.Runtime
         public Pool<T> GetPool<T>(string prefabName) where T : Component
         {
             var pool = GetPoolByPrefabName(prefabName);
+            if(pool == null)
+            {
+                Debug.LogError($"[Name]未找到预制体[{prefabName}]对应的{typeof(T).Name}池");
+                return null;
+            }
             if (pool is Pool<T> typedPool)
                 return typedPool;
 
