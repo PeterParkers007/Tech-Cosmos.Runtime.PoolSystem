@@ -14,6 +14,8 @@ namespace ZJM_PoolSystem.Runtime
         /// </summary>
         public List<PoolBase> pools;
 
+        private Dictionary<string, PoolBase> poolByName = new();
+
         /// <summary>
         /// 可选：对象池根节点（用于统一管理回收对象的父节点）
         /// </summary>
@@ -30,6 +32,7 @@ namespace ZJM_PoolSystem.Runtime
                 poolRoot = rootObj.transform;
                 rootObj.transform.parent = transform; // 作为管理器的子节点
             }
+            BuildPoolMap();
         }
 
         /// <summary>
@@ -44,25 +47,53 @@ namespace ZJM_PoolSystem.Runtime
             }
         }
 
-        /// <summary>
-        /// 根据类型获取对应的对象池（泛型重载，更便捷）
-        /// </summary>
-        /// <typeparam name="T">池管理的组件类型</typeparam>
-        /// <returns>对应的泛型对象池实例</returns>
-        public Pool<T> GetPool<T, U>() where T : Component
+        private void BuildPoolMap()
         {
+            poolByName.Clear();
             foreach (var pool in pools)
             {
-                if (pool is Pool<T> targetPool)
+                var prefabField = pool.GetType().GetField("prefab");
+                if (prefabField == null) continue;
+
+                var prefab = prefabField.GetValue(pool) as Component;
+                if (prefab != null && !poolByName.ContainsKey(prefab.name))
                 {
-                    if (targetPool.prefab.GetType() == typeof(U))
-                    {
-                        return targetPool;
-                    }
+                    poolByName[prefab.name] = pool;
                 }
             }
-            Debug.LogError($"未找到管理[{typeof(T).Name}]的对象池，请检查PoolManager配置");
+        }
+        /// <summary>
+        /// 根据名字 + 类型精确获取池（一个预制体 → 唯一池）
+        /// </summary>
+        public Pool<T> GetPool<T>(string prefabName) where T : Component
+        {
+            var pool = GetPoolByPrefabName(prefabName);
+            if (pool is Pool<T> typedPool)
+                return typedPool;
+
+            Debug.LogError($"未找到预制体[{prefabName}]对应的{typeof(T).Name}池");
             return null;
+        }
+        /// <summary>
+        /// 根据预制体名字获取池
+        /// </summary>
+        public PoolBase GetPoolByPrefabName(string prefabName)
+        {
+            poolByName.TryGetValue(prefabName, out var pool);
+            return pool;
+        }
+
+        /// <summary>
+        /// 回收对象到它对应的池
+        /// </summary>
+        public void ReleaseByPrefabName(Component instance)
+        {
+            var pool = GetPoolByPrefabName(instance.name);
+            if (pool != null)
+            {
+                var releaseMethod = pool.GetType().GetMethod("Release");
+                releaseMethod?.Invoke(pool, new object[] { instance });
+            }
         }
 
         /// <summary>
@@ -82,16 +113,16 @@ namespace ZJM_PoolSystem.Runtime
         /// <summary>
         /// 根据预设子类型获取对象池（返回精确类型，无需强转）
         /// </summary>
-        // public Pool<U> GetPool<T, U>() where T : Component where U : T
-        // {
-        //     foreach (var pool in pools)
-        //     {
-        //         if (pool is Pool<U> targetPool && targetPool.prefab is U)
-        //             return targetPool;
-        //     }
-        //     Debug.LogError($"未找到管理[{typeof(U).Name}]的对象池");
-        //     return null;
-        // }
+        public Pool<U> GetPool<T, U>() where T : Component where U : T
+        {
+            foreach (var pool in pools)
+            {
+                if (pool is Pool<U> targetPool && targetPool.prefab is U)
+                    return targetPool;
+            }
+            Debug.LogError($"未找到管理[{typeof(U).Name}]的对象池");
+            return null;
+        }
 
         /// <summary>
         /// 根据组件类型和预设类型动态获取对象池（运行时版本）
