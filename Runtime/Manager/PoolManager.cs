@@ -73,17 +73,16 @@ namespace ZJM_PoolSystem.Runtime
                 Debug.LogError($"未找到预制体[{prefabName}]的池");
                 return null;
             }
-            Type poolType = pool.PoolType;
-            if (poolType != null)
+
+            
+            Type prefabType = pool.PoolType;
+
+            if (prefabType.IsAssignableFrom(typeof(T)))
             {
-                Type prefabType = poolType.GetGenericArguments()[0]; // 池里预制体的类型
-                if (poolType.IsAssignableFrom(typeof(T)))          // 池的泛型参数是父类,T是目标子类
-                {
-                    return pool as Pool<T>;  // 安全转换
-                }
+                return pool as Pool<T>;
             }
 
-            Debug.LogError($"预制体[{prefabName}]的类型不兼容{typeof(T).Name}");
+            Debug.LogError($"预制体[{prefabName}]的类型{prefabType.Name}不兼容{typeof(T).Name}");
             return null;
         }
         /// <summary>
