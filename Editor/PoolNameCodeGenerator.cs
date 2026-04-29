@@ -6,7 +6,8 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using ZJM_PoolSystem;
-
+namespace ZJM_PoolSystem.Editor
+{
 public class PoolNameCodeGenerator : EditorWindow
 {
     [MenuItem("Tech-Cosmos/对象池/生成池名称常量类")]
@@ -94,5 +95,6 @@ public class PoolNameCodeGenerator : EditorWindow
 
         return string.IsNullOrEmpty(result) ? "Empty" : result;
     }
+}
 }
 #endif

@@ -4,7 +4,8 @@ using UnityEditor;
 using ZJM_PoolSystem.Runtime;
 using System.Linq;
 using ZJM_PoolSystem;
-
+namespace ZJM_PoolSystem.Editor
+{
 [CustomEditor(typeof(PoolManager))]
 public class PoolManagerEditor : Editor
 {
@@ -45,4 +46,6 @@ public class PoolManagerEditor : Editor
         Debug.Log($"已收集 {manager.pools.Count} 个对象池");
     }
 }
+}
+
 #endif
