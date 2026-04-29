@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.Pool;
+using System.Reflection;
+
 namespace ZJM_PoolSystem.Runtime
 {
     /// <summary>
@@ -107,6 +109,10 @@ namespace ZJM_PoolSystem.Runtime
             // 实例化预设，保持名称一致（便于调试）
             T newObj = Instantiate(prefab);
             newObj.name = prefab.name;
+
+            // 设置新创建对象的PoolName
+            SetPoolNameAttribute(newObj);
+
             return newObj;
         }
 
@@ -124,7 +130,7 @@ namespace ZJM_PoolSystem.Runtime
         protected virtual void OnRelease(T obj)
         {
             obj.gameObject.SetActive(false);
-            // 可选：将回收对象移动到统一父节点（避免场景层级混乱）
+            // 将回收对象移动到统一父节点（避免场景层级混乱）
             if (PoolManager.Instance.poolRoot != null)
                 obj.transform.SetParent(PoolManager.Instance.poolRoot);
         }
@@ -135,6 +141,47 @@ namespace ZJM_PoolSystem.Runtime
         protected virtual void On_Destroy(T obj)
         {
             Destroy(obj.gameObject);
+        }
+
+        /// <summary>
+        /// 设置对象的PoolName属性
+        /// </summary>
+        private void SetPoolNameAttribute(T obj)
+        {
+            if (obj == null || prefab == null) return;
+
+            // 获取组件上所有的PoolableAttribute
+            var attrs = obj.GetType().GetCustomAttributes(typeof(PoolableAttribute), false);
+            if (attrs != null && attrs.Length > 0)
+            {
+                var poolableAttr = attrs[0] as PoolableAttribute;
+                if (poolableAttr != null)
+                {
+                    // 设置PoolName为prefab的名称
+                    poolableAttr.PoolName = prefab.name;
+
+                    // 调试日志（可选）
+                    // Debug.Log($"[{typeof(T).Name}] 设置PoolName: {prefab.name} -> {obj.name}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 清空对象的PoolName属性（可选，在回收时调用）
+        /// </summary>
+        private void ClearPoolNameAttribute(T obj)
+        {
+            if (obj == null) return;
+
+            var attrs = obj.GetType().GetCustomAttributes(typeof(PoolableAttribute), false);
+            if (attrs != null && attrs.Length > 0)
+            {
+                var poolableAttr = attrs[0] as PoolableAttribute;
+                if (poolableAttr != null)
+                {
+                    poolableAttr.PoolName = null;
+                }
+            }
         }
 
         /// <summary>
