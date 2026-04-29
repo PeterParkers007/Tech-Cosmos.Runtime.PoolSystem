@@ -107,7 +107,7 @@ namespace ZJM_PoolSystem.Runtime
             }
 
             // 实例化预设，保持名称一致（便于调试）
-            T newObj = Instantiate(prefab);
+            T newObj = Instantiate(prefab, PoolManager.Instance.poolRoot);
             newObj.name = prefab.name;
 
             // 设置新创建对象的PoolName
