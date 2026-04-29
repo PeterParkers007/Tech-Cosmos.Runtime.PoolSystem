@@ -13,5 +13,16 @@ namespace ZJM_PoolSystem.Runtime
             var attr = typeof(T).GetCustomAttribute<PoolableAttribute>(false);
             return attr?.PoolName;
         }
+        public static string CleanName<T>(this T component ,string name) where T : Component
+        {
+            string cleanName = name;
+            if (cleanName.Contains("(Clone)"))
+            {
+                cleanName = cleanName.Replace("(Clone)", "").Trim();
+                // 同时修正对象名
+                name = cleanName;
+            }
+            return name;
+        }
     }
 }
