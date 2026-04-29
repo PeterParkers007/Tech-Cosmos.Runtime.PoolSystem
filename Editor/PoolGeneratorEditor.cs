@@ -226,7 +226,6 @@ namespace ZJM_PoolSystem.Generated
         {{
             base.OnGet(obj);
             // {displayName}特有的获取逻辑
-            // PoolName已在基类中自动设置
         }}
         
         protected override void OnRelease({componentType.Name} obj)
@@ -237,10 +236,8 @@ namespace ZJM_PoolSystem.Generated
         */
         
         // 注意：
-        // 1. PoolName会自动设置为prefab的名称
-        // 2. 可以通过反射获取PoolableAttribute来读取PoolName
-        // 3. 如果需要自定义逻辑，建议复制此文件到其他位置并修改
-        // 4. 否则下次重新生成时会覆盖修改
+                如果需要自定义逻辑，建议复制此文件到其他位置并修改
+                否则下次重新生成时会覆盖修改
     }}
 }}";
         }

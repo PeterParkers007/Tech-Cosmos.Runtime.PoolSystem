@@ -24,10 +24,6 @@ namespace ZJM_PoolSystem.Runtime
         /// </summary>
         public string Icon { get; set; }
 
-        /// <summary>
-        /// 当前对象所属的池名称（运行时动态设置）
-        /// </summary>
-        public string PoolName { get; set; }
 
         public PoolableAttribute() { }
 
