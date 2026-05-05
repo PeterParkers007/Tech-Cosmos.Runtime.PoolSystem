@@ -206,40 +206,39 @@ namespace ZJM_PoolSystem.Editor
             string componentNamespace = componentType.Namespace ?? "ZJM_PoolSystem.Runtime";
 
             return $@"// ====================================================
-// 自动生成的池类 - {DateTime.Now:yyyy-MM-dd HH:mm:ss}
-// 请勿手动修改此文件，重新生成会覆盖修改
-// ====================================================
+        // 自动生成的池类 - {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+        // 请勿手动修改此文件，重新生成会覆盖修改
+        // ====================================================
 
-using UnityEngine;
-using ZJM_PoolSystem.Runtime;
+        using UnityEngine;
+        using ZJM_PoolSystem.Runtime;
 
-namespace ZJM_PoolSystem.Generated
-{{
-    [CreateAssetMenu(fileName = ""New {displayName}"", menuName = ""{menuName}"", order = 100)]
-    public class {className} : Pool<{componentType.Name}>
-    {{
-        // 可以在这里添加特定于{componentType.Name}池的逻辑
-        // 例如：特定的初始化、获取、回收处理
-        
-        /* 示例：
-        protected override void OnGet({componentType.Name} obj)
+        namespace ZJM_PoolSystem.Generated
         {{
-            base.OnGet(obj);
-            // {displayName}特有的获取逻辑
-        }}
-        
-        protected override void OnRelease({componentType.Name} obj)
-        {{
-            // {displayName}特有的回收逻辑
-            base.OnRelease(obj);
-        }}
-        */
-        
-        // 注意：
-                如果需要自定义逻辑，建议复制此文件到其他位置并修改
-                否则下次重新生成时会覆盖修改
-    }}
-}}";
+            [CreateAssetMenu(fileName = ""New {displayName}"", menuName = ""{menuName}"", order = 100)]
+            public class {className} : Pool<{componentType.Name}>
+            {{
+                // 可以在这里添加特定于{componentType.Name}池的逻辑
+                // 例如：特定的初始化、获取、回收处理
+                
+                /* 示例：
+                protected override void OnGet({componentType.Name} obj)
+                {{
+                    base.OnGet(obj);
+                    // {displayName}特有的获取逻辑
+                }}
+                
+                protected override void OnRelease({componentType.Name} obj)
+                {{
+                    // {displayName}特有的回收逻辑
+                    base.OnRelease(obj);
+                }}
+                */
+                
+                // 注意：如果需要自定义逻辑，建议复制此文件到其他位置并修改
+                // 否则下次重新生成时会覆盖修改
+            }}
+        }}";
         }
     }
 }
